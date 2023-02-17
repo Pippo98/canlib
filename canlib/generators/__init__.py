@@ -1,1 +1,1 @@
-from canlib.generators import csv, id, lib, proto
+from canlib.generators import loader

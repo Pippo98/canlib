@@ -1,14 +1,11 @@
 import errno
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 from jsonschema import validate
 
-from canlib.common.network import Network
-
-
-def load_json(path: Path, validation_schema_path=None) -> dict:
+def load_json(path: Path, validation_schema_path:  Optional[Path]=None) -> dict:
     with open(path, "r") as file:
         data = json.load(file)
 
@@ -27,29 +24,3 @@ def create_subtree(path: Path) -> None:
         except OSError as exception:  # Guard against race condition
             if exception.errno != errno.EEXIST:
                 raise exception
-
-
-def load_networks(networks_dir: Path, ids_dir: Path = None) -> List[Network]:
-    networks = []
-
-    for directory in networks_dir.iterdir():
-        name = directory.name
-
-        path = networks_dir / name / "network.json"
-        assert path.exists()
-
-        can_config_path = networks_dir / name / "can_config.json"
-
-        if ids_dir is None:
-            ids_path = None
-        else:
-            ids_path = ids_dir / name / "ids.json"
-            assert ids_path.exists()
-
-        network = Network.load(name, path, can_config_path, ids_path)
-        networks.append(network)
-
-    return networks
-
-
-DEFAULT_DELIMITER = " "
